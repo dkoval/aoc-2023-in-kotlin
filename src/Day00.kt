@@ -14,7 +14,7 @@ fun main() {
     check(part1(testInput) == 42)
     //check(part2(testInput) == 42)
 
-    val input = readInput("day${DAY_ID}/Day${DAY_ID}")
+    val input = readInput("day$DAY_ID/Day$DAY_ID")
     part1(input).println()
     part2(input).println()
 }
