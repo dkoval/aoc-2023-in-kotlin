@@ -29,7 +29,7 @@ fun main() {
         )
 
         fun indexOfDigit(line: String, last: Boolean): Int {
-            val predicate = { c: Char -> c.isDigit() }
+            val predicate = Char::isDigit
             return if (last) line.indexOfLast(predicate) else line.indexOfFirst(predicate)
         }
 
