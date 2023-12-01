@@ -48,10 +48,7 @@ fun main() {
             return if (last) occurrences.maxBy(selector) else occurrences.minBy(selector)
         }
 
-        fun findDigit(
-            line: String,
-            last: Boolean = false
-        ): Int {
+        fun findDigit(line: String, last: Boolean = false): Int {
             val indexOfDigit = indexOfDigit(line, last)
             val (indexOfWord, word) = indexOfWord(line, last)
             val canTakeIndexOfDigit = if (last) indexOfDigit > indexOfWord else indexOfDigit < indexOfWord
