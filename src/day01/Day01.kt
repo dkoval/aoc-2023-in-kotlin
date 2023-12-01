@@ -28,33 +28,40 @@ fun main() {
             "nine" to 9
         )
 
-        val words = mapping.keys
+        fun indexOfDigit(line: String, last: Boolean): Int {
+            val predicate = { c: Char -> c.isDigit() }
+            return if (last) line.indexOfLast(predicate) else line.indexOfFirst(predicate)
+        }
+
+        fun indexOfWord(line: String, last: Boolean): IndexedValue<String> {
+            // word -> occurs at index
+            val occurrences = mapping.keys.asSequence()
+                .map { word ->
+                    var index = if (last) line.lastIndexOf(word) else line.indexOf(word)
+                    if (index == -1 && !last) {
+                        index = line.length
+                    }
+                    IndexedValue(index, word)
+                }
+
+            val selector = { element: IndexedValue<String> -> element.index }
+            return if (last) occurrences.maxBy(selector) else occurrences.minBy(selector)
+        }
+
+        fun findDigit(
+            line: String,
+            last: Boolean = false
+        ): Int {
+            val indexOfDigit = indexOfDigit(line, last)
+            val (indexOfWord, word) = indexOfWord(line, last)
+            val canTakeIndexOfDigit = if (last) indexOfDigit > indexOfWord else indexOfDigit < indexOfWord
+            return if (indexOfDigit != -1 && canTakeIndexOfDigit) line[indexOfDigit].digitToInt() else mapping[word]!!
+        }
+
         return input.asSequence()
             .map { line ->
-                val indexOfFirstDigit = line.indexOfFirst { c -> c.isDigit() }
-                val indexOfLastDigit = line.indexOfLast { c -> c.isDigit() }
-
-                val (indexOfFirstWord, firstWord) = words.asSequence()
-                    .map { word ->
-                        val index = line.indexOf(word)
-                        (if (index != -1) index else line.length) to word
-                    }
-                    .minBy { (index, _) -> index }
-
-                val (indexOfLastWord, lastWord) = words.asSequence()
-                    .map { word ->
-                        val index = line.lastIndexOf(word)
-                        index to word
-                    }
-                    .maxBy { (index, _) -> index }
-
-                val d1 =
-                    if (indexOfFirstDigit != -1 && indexOfFirstDigit < indexOfFirstWord) line[indexOfFirstDigit].digitToInt()
-                    else mapping[firstWord]!!
-                val d2 =
-                    if (indexOfFirstDigit != -1 && indexOfLastDigit > indexOfLastWord) line[indexOfLastDigit].digitToInt()
-                    else mapping[lastWord]!!
-
+                val d1 = findDigit(line)
+                val d2 = findDigit(line, last = true)
                 d1 * 10 + d2
             }
             .sum()
