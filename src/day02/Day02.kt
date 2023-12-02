@@ -12,14 +12,14 @@ fun main() {
         // Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
         return input.asSequence()
             .map { line ->
-                val (s1, s2) = line.split(":")
+                val (s1, s2) = line.split(": ")
                 val (_, id) = s1.split(" ")
 
-                val setsOfCubes = s2.split(";")
+                val setsOfCubes = s2.split("; ")
                     .map { setOfCubes ->
-                        setOfCubes.trim().split(",")
+                        setOfCubes.split(", ")
                             .map { cubes ->
-                                val (count, color) = cubes.trim().split(" ")
+                                val (count, color) = cubes.split(" ")
                                 count.toInt() to color
                             }
                             .associateBy(
