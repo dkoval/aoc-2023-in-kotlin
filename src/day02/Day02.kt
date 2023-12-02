@@ -49,11 +49,7 @@ fun main() {
         return parseInput(input)
             .map { (_, setsOfCubes) ->
                 setsOfCubes.fold(
-                    mutableMapOf(
-                        "red" to 0,
-                        "green" to 0,
-                        "blue" to 0
-                    )
+                    colors.associateWithTo(mutableMapOf()) { 0 }
                 )
                 { acc, curr ->
                     for (color in colors) {
