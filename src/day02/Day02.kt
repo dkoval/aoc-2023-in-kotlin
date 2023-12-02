@@ -24,7 +24,8 @@ fun main() {
                             }
                             .associateBy(
                                 keySelector = { (_, color) -> color },
-                                valueTransform = { (count, _) -> count })
+                                valueTransform = { (count, _) -> count }
+                            )
                     }
 
                 id.toInt() to setsOfCubes
