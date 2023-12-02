@@ -33,7 +33,7 @@ fun main() {
             return if (last) line.indexOfLast(predicate) else line.indexOfFirst(predicate)
         }
 
-        fun indexOfWord(line: String, last: Boolean): IndexedValue<String> {
+        fun indexOfTextDigit(line: String, last: Boolean): IndexedValue<String> {
             // word -> occurs at index
             val occurrences = mapping.keys.asSequence()
                 .map { word ->
@@ -50,9 +50,9 @@ fun main() {
 
         fun findDigit(line: String, last: Boolean = false): Int {
             val indexOfDigit = indexOfDigit(line, last)
-            val (indexOfWord, word) = indexOfWord(line, last)
-            val canTakeIndexOfDigit = if (last) indexOfDigit > indexOfWord else indexOfDigit < indexOfWord
-            return if (indexOfDigit != -1 && canTakeIndexOfDigit) line[indexOfDigit].digitToInt() else mapping[word]!!
+            val (indexOfTextDigit, textDigit) = indexOfTextDigit(line, last)
+            val canTakeIndexOfDigit = if (last) indexOfDigit > indexOfTextDigit else indexOfDigit < indexOfTextDigit
+            return if (indexOfDigit != -1 && canTakeIndexOfDigit) line[indexOfDigit].digitToInt() else mapping[textDigit]!!
         }
 
         return input.asSequence()
