@@ -124,9 +124,9 @@ fun main() {
         return gears.asSequence()
             .map { (row, col) ->
                 // get connected part numbers
-                exploreAdjacent<MutableSet<Int>>(
+                exploreAdjacent(
                     input, row, col,
-                    init = mutableSetOf(),
+                    init = mutableSetOf<Int>(),
                     isGood = { _, nextRow, nextCol -> nextRow to nextCol in partNumbers },
                     operation = { answer, _, nextRow, nextCol -> answer.also { it += partNumbers[nextRow to nextCol]!! } }
                 )
