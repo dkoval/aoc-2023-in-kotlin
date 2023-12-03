@@ -6,11 +6,19 @@ import readInput
 private const val DAY_ID = "03"
 
 fun main() {
-
-    fun adjacentToSymbol(grid: List<String>, row: Int, col: Int): Boolean {
+    fun <T> exploreAdjacent(
+        grid: List<String>,
+        row: Int,
+        col: Int,
+        init: T,
+        isGood: (c: Char, nextRow: Int, nextCol: Int) -> Boolean,
+        operation: (answer: T, c: Char, nextRow: Int, nextCol: Int) -> T,
+        earlyTerminate: Boolean = false
+    ): T {
         val m = grid.size
         val n = grid[0].length
 
+        var answer = init
         for (dx in -1..1) {
             for (dy in -1..1) {
                 if (dx == 0 && dy == 0) {
@@ -27,12 +35,25 @@ fun main() {
 
                 // check symbol
                 val c = grid[nextRow][nextCol]
-                if (!c.isDigit() && c != '.') {
-                    return true
+                if (isGood(c, nextRow, nextCol)) {
+                    answer = operation(answer, c, nextRow, nextCol)
+                    if (earlyTerminate) {
+                        return answer
+                    }
                 }
             }
         }
-        return false
+        return answer
+    }
+
+    fun isAdjacentToSymbol(grid: List<String>, row: Int, col: Int): Boolean {
+        return exploreAdjacent(
+            grid, row, col,
+            init = false,
+            isGood = { c, _, _ -> !c.isDigit() && c != '.' },
+            operation = { _, _, _, _ -> true },
+            earlyTerminate = true
+        )
     }
 
     fun part1(input: List<String>): Int {
@@ -44,7 +65,7 @@ fun main() {
                 if (c.isDigit()) {
                     x *= 10
                     x += c.digitToInt()
-                    if (!include && adjacentToSymbol(input, row, col)) {
+                    if (!include && isAdjacentToSymbol(input, row, col)) {
                         include = true
                     }
                 } else {
@@ -65,11 +86,10 @@ fun main() {
     }
 
     fun part2(input: List<String>): Int {
-        val m = input.size
-        val n = input[0].length
-
         // digit's (row, col) -> part number
         val partNumbers = mutableMapOf<Pair<Int, Int>, Int>()
+        // gear's (row, col)
+        val gears = mutableListOf<Pair<Int, Int>>()
         for ((row, line) in input.withIndex()) {
             var x = 0
             var include = false
@@ -79,7 +99,7 @@ fun main() {
                     x *= 10
                     x += c.digitToInt()
                     digits += row to col
-                    if (!include && adjacentToSymbol(input, row, col)) {
+                    if (!include && isAdjacentToSymbol(input, row, col)) {
                         include = true
                     }
                 } else {
@@ -89,6 +109,9 @@ fun main() {
                         digits = mutableListOf()
                     }
                     x = 0
+                    if (c == '*') {
+                        gears += row to col
+                    }
                 }
             }
 
@@ -99,39 +122,19 @@ fun main() {
         }
 
         fun connectedPartNumbers(row: Int, col: Int): Set<Int> {
-            val xs = mutableSetOf<Int>()
-            for (dx in -1..1) {
-                for (dy in -1..1) {
-                    if (dx == 0 && dy == 0) {
-                        continue
-                    }
-
-                    val nextRow = row + dx
-                    val nextCol = col + dy
-
-                    // check boundaries
-                    if (nextRow < 0 || nextRow == m || nextCol < 0 || nextCol == n) {
-                        continue
-                    }
-
-                    val cell = nextRow to nextCol
-                    if (cell in partNumbers) {
-                        xs += partNumbers[cell]!!
-                    }
-                }
-            }
-            return xs
+            return exploreAdjacent(
+                input, row, col,
+                init = mutableSetOf(),
+                isGood = { _, nextRow, nextCol -> nextRow to nextCol in partNumbers },
+                operation = { answer, _, nextRow, nextCol -> answer.also { it += partNumbers[nextRow to nextCol]!! } }
+            )
         }
 
         var sumOfGearRatios = 0
-        for ((row, line) in input.withIndex()) {
-            for ((col, c) in line.withIndex()) {
-                if (c == '*') {
-                    val xs = connectedPartNumbers(row, col)
-                    if (xs.size == 2) {
-                        sumOfGearRatios += xs.fold(1) { acc, curr -> acc * curr }
-                    }
-                }
+        for ((row, col) in gears) {
+            val xs = connectedPartNumbers(row, col)
+            if (xs.size == 2) {
+                sumOfGearRatios += xs.fold(1) { acc, curr -> acc * curr }
             }
         }
         return sumOfGearRatios
