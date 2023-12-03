@@ -130,14 +130,11 @@ fun main() {
             )
         }
 
-        var sumOfGearRatios = 0
-        for ((row, col) in gears) {
-            val xs = connectedPartNumbers(row, col)
-            if (xs.size == 2) {
-                sumOfGearRatios += xs.fold(1) { acc, curr -> acc * curr }
-            }
-        }
-        return sumOfGearRatios
+        return gears.asSequence()
+            .map { (row, col) -> connectedPartNumbers(row, col) }
+            .filter { xs -> xs.size == 2 }
+            .map { xs -> xs.fold(1) { acc, curr -> acc * curr }  }
+            .sum()
     }
 
     // test if implementation meets criteria from the description, like:
