@@ -121,17 +121,16 @@ fun main() {
             }
         }
 
-        fun connectedPartNumbers(row: Int, col: Int): Set<Int> {
-            return exploreAdjacent(
-                input, row, col,
-                init = mutableSetOf(),
-                isGood = { _, nextRow, nextCol -> nextRow to nextCol in partNumbers },
-                operation = { answer, _, nextRow, nextCol -> answer.also { it += partNumbers[nextRow to nextCol]!! } }
-            )
-        }
-
         return gears.asSequence()
-            .map { (row, col) -> connectedPartNumbers(row, col) }
+            .map { (row, col) ->
+                // get connected part numbers
+                exploreAdjacent<MutableSet<Int>>(
+                    input, row, col,
+                    init = mutableSetOf(),
+                    isGood = { _, nextRow, nextCol -> nextRow to nextCol in partNumbers },
+                    operation = { answer, _, nextRow, nextCol -> answer.also { it += partNumbers[nextRow to nextCol]!! } }
+                )
+            }
             .filter { xs -> xs.size == 2 }
             .map { xs -> xs.fold(1) { acc, curr -> acc * curr }  }
             .sum()
