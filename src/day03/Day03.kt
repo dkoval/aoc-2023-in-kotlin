@@ -11,8 +11,8 @@ fun main() {
         row: Int,
         col: Int,
         init: T,
-        isGood: (c: Char, nextRow: Int, nextCol: Int) -> Boolean,
-        operation: (answer: T, c: Char, nextRow: Int, nextCol: Int) -> T,
+        isGood: (c: Char, cell: Pair<Int, Int>) -> Boolean,
+        operation: (answer: T, c: Char, cell: Pair<Int, Int>) -> T,
         earlyTerminate: Boolean = false
     ): T {
         val m = grid.size
@@ -35,8 +35,9 @@ fun main() {
 
                 // check symbol
                 val c = grid[nextRow][nextCol]
-                if (isGood(c, nextRow, nextCol)) {
-                    answer = operation(answer, c, nextRow, nextCol)
+                val cell = nextRow to nextCol
+                if (isGood(c, cell)) {
+                    answer = operation(answer, c, cell)
                     if (earlyTerminate) {
                         return answer
                     }
@@ -50,8 +51,8 @@ fun main() {
         return exploreAdjacent(
             grid, row, col,
             init = false,
-            isGood = { c, _, _ -> !c.isDigit() && c != '.' },
-            operation = { _, _, _, _ -> true },
+            isGood = { c, _, -> !c.isDigit() && c != '.' },
+            operation = { _, _, _ -> true },
             earlyTerminate = true
         )
     }
@@ -127,8 +128,8 @@ fun main() {
                 exploreAdjacent(
                     input, row, col,
                     init = mutableSetOf<Int>(),
-                    isGood = { _, nextRow, nextCol -> nextRow to nextCol in partNumbers },
-                    operation = { answer, _, nextRow, nextCol -> answer.also { it += partNumbers[nextRow to nextCol]!! } }
+                    isGood = { _, cell -> cell in partNumbers },
+                    operation = { answer, _, cell -> answer.also { it += partNumbers[cell]!! } }
                 )
             }
             .filter { xs -> xs.size == 2 }
