@@ -2,8 +2,6 @@ package day04
 
 import println
 import readInput
-import java.util.ArrayDeque
-import java.util.Queue
 
 private const val DAY_ID = "04"
 
@@ -14,52 +12,43 @@ fun main() {
 
     // Format:
     // Card 1: 41 48 83 86 17 | 83 86  6 31 17 9 48 53
-    fun parseInput(input: List<String>): Map<Int, Card> {
+    fun parseInput(input: List<String>): List<Card> {
         fun parseNumbers(nums: String): Set<Int> = nums.split(" ").asSequence()
             .filter { it.isNotEmpty() }
             .map { it.trim().toInt() }
             .toSet()
 
         // card ID -> Card
-        return input.asSequence()
-            .map { line ->
-                val (s1, s2) = line.split(": ")
-                val (nums1, nums2) = s2.split(" | ")
+        return input.map { line ->
+            val (s1, s2) = line.split(": ")
+            val (nums1, nums2) = s2.split(" | ")
 
-                val id = s1.removePrefix("Card ").trim().toInt()
-                val xs = parseNumbers(nums1)
-                val ys = parseNumbers(nums2)
+            val id = s1.removePrefix("Card ").trim().toInt()
+            val xs = parseNumbers(nums1)
+            val ys = parseNumbers(nums2)
 
-                id to Card(id, xs, ys)
-            }
-            .toMap()
+            Card(id, xs, ys)
+        }
     }
 
     fun part1(input: List<String>): Int {
-        return parseInput(input).asSequence()
-            .map { (_, card) ->
-                val matches = card.matches
-                if (matches > 0) 1 shl (matches - 1) else 0
-            }
-            .sum()
+        return parseInput(input).sumOf { card ->
+            val matches = card.matches
+            if (matches > 0) 1 shl (matches - 1) else 0
+        }
     }
 
     fun part2(input: List<String>): Int {
         val cards = parseInput(input)
-        // cards to process
-        val q: Queue<Int> = ArrayDeque(cards.keys)
-        // card ID -> count
-        val counts = mutableMapOf<Int, Int>()
-        while (!q.isEmpty()) {
-            val id = q.poll()
-            counts[id] = (counts[id] ?: 0) + 1
-            // generate IDs of next cards to process
-            val matches = cards[id]!!.matches
-            for (nextId in (id + 1)..(id + matches).coerceAtMost(cards.size)) {
-                q.offer(nextId)
+        val n = cards.size
+
+        val counts = IntArray(n) { 1 }
+        for (i in 0 until  n - 1) {
+            for (j in (i + 1)..minOf(i + cards[i].matches, n - 1)) {
+                counts[j] += counts[i]
             }
         }
-        return counts.values.sum()
+        return counts.sum()
     }
 
     // test if implementation meets criteria from the description, like:
