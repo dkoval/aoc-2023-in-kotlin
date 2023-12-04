@@ -18,7 +18,7 @@ fun main() {
             .map { it.trim().toInt() }
             .toSet()
 
-        // card ID -> Card
+        // list of Cards
         return input.map { line ->
             val (s1, s2) = line.split(": ")
             val (nums1, nums2) = s2.split(" | ")
