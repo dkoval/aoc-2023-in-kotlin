@@ -7,38 +7,36 @@ import java.util.Queue
 
 private const val DAY_ID = "04"
 
-private data class Card(val id: Int, val xs: Set<Int>, val ys: Set<Int>) {
-    val matches: Int = xs.count { it in ys }
-
-    companion object {
-        // Format:
-        // Card 1: 41 48 83 86 17 | 83 86  6 31 17 9 48 53
-        fun parseInput(input: List<String>): Map<Int, Card> {
-            fun parseNumbers(nums: String): Set<Int> = nums.split(" ").asSequence()
-                .filter { it.isNotEmpty() }
-                .map { it.trim().toInt() }
-                .toSet()
-
-            // card ID -> Card
-            return input.asSequence()
-                .map { line ->
-                    val (s1, s2) = line.split(": ")
-                    val (nums1, nums2) = s2.split(" | ")
-
-                    val id = s1.removePrefix("Card ").trim().toInt()
-                    val xs = parseNumbers(nums1)
-                    val ys = parseNumbers(nums2)
-
-                    id to Card(id, xs, ys)
-                }
-                .toMap()
-        }
-    }
-}
-
 fun main() {
+    data class Card(val id: Int, val xs: Set<Int>, val ys: Set<Int>) {
+        val matches: Int = xs.count { it in ys }
+    }
+
+    // Format:
+    // Card 1: 41 48 83 86 17 | 83 86  6 31 17 9 48 53
+    fun parseInput(input: List<String>): Map<Int, Card> {
+        fun parseNumbers(nums: String): Set<Int> = nums.split(" ").asSequence()
+            .filter { it.isNotEmpty() }
+            .map { it.trim().toInt() }
+            .toSet()
+
+        // card ID -> Card
+        return input.asSequence()
+            .map { line ->
+                val (s1, s2) = line.split(": ")
+                val (nums1, nums2) = s2.split(" | ")
+
+                val id = s1.removePrefix("Card ").trim().toInt()
+                val xs = parseNumbers(nums1)
+                val ys = parseNumbers(nums2)
+
+                id to Card(id, xs, ys)
+            }
+            .toMap()
+    }
+
     fun part1(input: List<String>): Int {
-        return Card.parseInput(input).asSequence()
+        return parseInput(input).asSequence()
             .map { (_, card) ->
                 val matches = card.matches
                 if (matches > 0) 1 shl (matches - 1) else 0
@@ -47,7 +45,7 @@ fun main() {
     }
 
     fun part2(input: List<String>): Int {
-        val cards = Card.parseInput(input)
+        val cards = parseInput(input)
         // cards to process
         val q: Queue<Int> = ArrayDeque(cards.keys)
         // card ID -> count
