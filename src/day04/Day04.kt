@@ -18,16 +18,15 @@ fun main() {
             .map { it.trim().toInt() }
             .toSet()
 
-        // list of Cards
+        // list of cards
         return input.map { line ->
             val (s1, s2) = line.split(": ")
             val (nums1, nums2) = s2.split(" | ")
-
-            val id = s1.removePrefix("Card ").trim().toInt()
-            val xs = parseNumbers(nums1)
-            val ys = parseNumbers(nums2)
-
-            Card(id, xs, ys)
+            Card(
+                id = s1.removePrefix("Card ").trim().toInt(),
+                xs = parseNumbers(nums1),
+                ys = parseNumbers(nums2)
+            )
         }
     }
 
@@ -43,7 +42,7 @@ fun main() {
         val n = cards.size
 
         val counts = IntArray(n) { 1 }
-        for (i in 0 until  n - 1) {
+        for (i in 0 until n - 1) {
             for (j in (i + 1)..minOf(i + cards[i].matches, n - 1)) {
                 counts[j] += counts[i]
             }
