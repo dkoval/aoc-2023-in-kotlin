@@ -66,17 +66,12 @@ fun main() {
 
     fun part2(input: String): Long {
         val (seeds, mappings) = parseInput(input)
-        val rangeOfSeeds = seeds.chunked(2)
+        val rangeOfSeeds = seeds.chunked(2).map { (start, length) -> start until start + length }
 
         fun isGood(x: Long, mappingIndex: Int): Boolean {
             if (mappingIndex < 0) {
                 // check if x is in range of seeds
-                for ((start, length) in rangeOfSeeds) {
-                    if (x in start until start + length) {
-                        return true
-                    }
-                }
-                return false
+                return rangeOfSeeds.any { x in it }
             }
 
             // x is the destination in the current mapping
