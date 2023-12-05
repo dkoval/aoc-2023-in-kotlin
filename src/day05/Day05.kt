@@ -65,15 +65,54 @@ fun main() {
     }
 
     fun part2(input: String): Long {
-        return 42
+        val (seeds, mappings) = parseInput(input)
+
+        val rangeOfSeeds = seeds.chunked(2)
+        val categories = mappings.keys.reversed()
+
+        fun isGood(x: Long, categoryIndex: Int): Boolean {
+            if (categoryIndex == categories.size) {
+                // check if x is in range of seeds
+                for ((start, length) in rangeOfSeeds) {
+                    if (x in start until start + length) {
+                        return true
+                    }
+                }
+                return false
+            }
+
+            // x is the destination in the current category
+            val category = categories[categoryIndex]
+            var next = x
+            for (range in mappings[category]!!) {
+                if (x in range.dstStart until range.dstStart + range.length) {
+                    val offset = x - range.dstStart
+                    next = range.srcStart + offset
+                    break
+                }
+            }
+            return isGood(next, categoryIndex + 1)
+        }
+
+        val lowestLocationUpperBoundary = mappings["humidity-to-location"]!!.asSequence()
+            .map { range -> range.dstStart + range.length - 1 }
+            .max()
+
+        // TODO: brute force, optimize
+        for (location in 0..lowestLocationUpperBoundary) {
+            if (isGood(location, 0)) {
+                return location
+            }
+        }
+        return lowestLocationUpperBoundary
     }
 
     // test if implementation meets criteria from the description, like:
     val testInput = readInputAsString("day$DAY_ID/Day${DAY_ID}_test")
     check(part1(testInput) == 35L)
-    //check(part2(testInput).println() == 46L)
+    check(part2(testInput) == 46L)
 
     val input = readInputAsString("day$DAY_ID/Day$DAY_ID")
     part1(input).println() // answer = 51580674
-    //part2(input).println()
+    part2(input).println() // answer = 99751240
 }
