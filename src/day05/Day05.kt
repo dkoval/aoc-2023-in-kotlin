@@ -6,7 +6,7 @@ import readInputAsString
 private const val DAY_ID = "05"
 
 fun main() {
-    data class MappingRange(val dstStart: Long, val srcStart: Long, val length: Long)
+    data class MappingRange(val srcStart: Long, val dstStart: Long, val length: Long)
     data class Input(val seeds: List<Long>, val mappings: Map<String, List<MappingRange>>)
 
     fun parseInput(input: String): Input {
@@ -22,7 +22,7 @@ fun main() {
         //39 0 15
         //...
         val lines = input.split("\n\n")
-        val seeds = lines.first().removePrefix("seeds: ").split(" ").map { it.trim().toLong() }
+        val seeds = lines.first().removePrefix("seeds: ").split(" ").map { it.toLong() }
 
         val mappings = lines.drop(1).asSequence()
             .map { block ->
@@ -34,7 +34,7 @@ fun main() {
 
                 val ranges = mapping.drop(1)
                     .map { nums ->
-                        val (srcRangeStart, dstRangeStart, length) = nums.split(" ").map { it.toLong() }
+                        val (dstRangeStart, srcRangeStart, length) = nums.split(" ").map { it.toLong() }
                         MappingRange(srcRangeStart, dstRangeStart, length)
                     }
 
