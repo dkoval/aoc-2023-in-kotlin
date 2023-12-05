@@ -94,17 +94,17 @@ fun main() {
             return isGood(next, categoryIndex + 1)
         }
 
-        val lowestLocationUpperBoundary = mappings["humidity-to-location"]!!.asSequence()
+        val locationUpperBoundary = mappings["humidity-to-location"]!!.asSequence()
             .map { range -> range.dstStart + range.length - 1 }
             .max()
 
         // TODO: brute force, optimize
-        for (location in 0..lowestLocationUpperBoundary) {
+        for (location in 0..locationUpperBoundary) {
             if (isGood(location, 0)) {
                 return location
             }
         }
-        return lowestLocationUpperBoundary
+        return locationUpperBoundary
     }
 
     // test if implementation meets criteria from the description, like:
