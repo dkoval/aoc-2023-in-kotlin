@@ -35,12 +35,12 @@ fun main() {
     fun part2(input: List<String>): Int {
         val (times, dists) = parseInput(input)
 
-        fun toNum(xs: List<Int>): Long {
-            return xs.joinToString(separator = "").toLong()
+        fun List<Int>.toLong(): Long {
+            return joinToString(separator = "").toLong()
         }
 
-        val time = toNum(times)
-        val dist = toNum(dists)
+        val time = times.toLong()
+        val dist = dists.toLong()
         return (1 until time).asSequence()
             .map { v -> v * (time - v) }
             .count { d -> d > dist }
