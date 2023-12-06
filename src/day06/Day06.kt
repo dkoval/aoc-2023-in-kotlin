@@ -22,16 +22,12 @@ fun main() {
 
     fun part1(input: List<String>): Int {
         val (times, dists) = parseInput(input)
-        val n = times.size
 
-        return (0 until n).asSequence()
-            .map { i ->
-                (1..times[i]).asSequence()
-                    .map { v ->
-                        val t = times[i] - v
-                        v * t
-                    }
-                    .count { d -> d > dists[i] }
+        return times.zip(dists).asSequence()
+            .map { (time, dist) ->
+                (1 until time).asSequence()
+                    .map { v -> v * (time - v) }
+                    .count { d -> d > dist }
             }
             .reduce { x, y -> x * y }
     }
@@ -45,11 +41,8 @@ fun main() {
 
         val time = toNum(times)
         val dist = toNum(dists)
-        return (1..time).asSequence()
-            .map { v ->
-                val t = time - v
-                v * t
-            }
+        return (1 until time).asSequence()
+            .map { v -> v * (time - v) }
             .count { d -> d > dist }
     }
 
