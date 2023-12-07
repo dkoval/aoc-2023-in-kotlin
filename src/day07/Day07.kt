@@ -11,7 +11,8 @@ private data class HandInfo(
     val mostFrequentCard: Char
 ) {
     enum class Type(val weight: Int) {
-        FiveOfKind(7), FourOfKind(6),
+        FiveOfKind(7),
+        FourOfKind(6),
         FullHouse(5),
         ThreeOfKind(4),
         TwoPair(3),
@@ -21,18 +22,18 @@ private data class HandInfo(
 
     companion object {
         fun of(hand: String): HandInfo {
-            val countsWithoutJokers = mutableMapOf<Char, Int>()
-            var jockers = 0
+            val countsWithoutJoker = mutableMapOf<Char, Int>()
+            var jokers = 0
             var mostFrequentCard = '?'
             var maxCount = 0
             for (card in hand) {
                 if (card == 'J') {
-                    jockers++
+                    jokers++
                     continue
                 }
 
-                val newCount = (countsWithoutJokers[card] ?: 0) + 1
-                countsWithoutJokers[card] = newCount
+                val newCount = (countsWithoutJoker[card] ?: 0) + 1
+                countsWithoutJoker[card] = newCount
                 if (mostFrequentCard == '?') {
                     mostFrequentCard = card
                     maxCount = 1
@@ -41,7 +42,7 @@ private data class HandInfo(
                     maxCount = newCount
                 }
             }
-            return HandInfo(countsWithoutJokers, jockers, mostFrequentCard)
+            return HandInfo(countsWithoutJoker, jokers, mostFrequentCard)
         }
     }
 
