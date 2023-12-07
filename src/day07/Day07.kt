@@ -92,7 +92,7 @@ fun main() {
             .toList()
     }
 
-    fun solve(input: List<String>, weights: Map<Char, Int>, type: (hand: String) -> HandInfo.Type): Int {
+    fun solve(input: List<String>, cardWeights: Map<Char, Int>, type: (hand: String) -> HandInfo.Type): Int {
         return parseInput(input)
             .map { (hand, bid) -> (hand to bid) to type(hand) }
             .sortedWith(Comparator { x, y ->
@@ -105,9 +105,9 @@ fun main() {
 
                 val (hand1, _) = handToBid1
                 val (hand2, _) = handToBid2
-                for ((c1, c2) in hand1.zip(hand2)) {
-                    if (c1 != c2) {
-                        return@Comparator compareValues<Int>(weights[c1]!!, weights[c2]!!)
+                for ((card1, card2) in hand1.zip(hand2)) {
+                    if (card1 != card2) {
+                        return@Comparator compareValues<Int>(cardWeights[card1]!!, cardWeights[card2]!!)
                     }
                 }
                 return@Comparator 0
