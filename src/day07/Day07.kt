@@ -20,32 +20,6 @@ private data class HandInfo(
         HighCard(1)
     }
 
-    companion object {
-        fun of(hand: String): HandInfo {
-            val countsWithoutJoker = mutableMapOf<Char, Int>()
-            var jokers = 0
-            var mostFrequentCard = '?'
-            var maxCount = 0
-            for (card in hand) {
-                if (card == 'J') {
-                    jokers++
-                    continue
-                }
-
-                val newCount = (countsWithoutJoker[card] ?: 0) + 1
-                countsWithoutJoker[card] = newCount
-                if (mostFrequentCard == '?') {
-                    mostFrequentCard = card
-                    maxCount = 1
-                } else if (newCount > maxCount) {
-                    mostFrequentCard = card
-                    maxCount = newCount
-                }
-            }
-            return HandInfo(countsWithoutJoker, jokers, mostFrequentCard)
-        }
-    }
-
     fun getTypePart1(): Type {
         val xs = countsWithoutJokers.values.toMutableList()
         if (jokers > 0) {
@@ -78,6 +52,32 @@ private data class HandInfo(
         xs.size == 3 && xs.max() == 2 -> Type.TwoPair
         xs.size == 4 -> Type.OnePair
         else -> Type.HighCard
+    }
+
+    companion object {
+        fun of(hand: String): HandInfo {
+            val countsWithoutJoker = mutableMapOf<Char, Int>()
+            var jokers = 0
+            var mostFrequentCard = '?'
+            var maxCount = 0
+            for (card in hand) {
+                if (card == 'J') {
+                    jokers++
+                    continue
+                }
+
+                val newCount = (countsWithoutJoker[card] ?: 0) + 1
+                countsWithoutJoker[card] = newCount
+                if (mostFrequentCard == '?') {
+                    mostFrequentCard = card
+                    maxCount = 1
+                } else if (newCount > maxCount) {
+                    mostFrequentCard = card
+                    maxCount = newCount
+                }
+            }
+            return HandInfo(countsWithoutJoker, jokers, mostFrequentCard)
+        }
     }
 }
 
