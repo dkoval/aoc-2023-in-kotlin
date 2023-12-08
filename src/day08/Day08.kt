@@ -64,13 +64,9 @@ fun main() {
             return x * y / gcd(x, y)
         }
 
-        return nodes.keys
-            .fold(mutableListOf<Long>()) { acc, src ->
-                if (src.endsWith("A")) {
-                    acc += getCycleLength(src).toLong()
-                }
-                acc
-            }
+        return nodes.keys.asSequence()
+            .filter { src -> src.endsWith("A") }
+            .map { src -> getCycleLength(src).toLong() }
             .reduce { x, y -> lcm(x, y) }
     }
 
