@@ -43,15 +43,21 @@ fun main() {
         fun getCycleLength(src: String): Int {
             var i = 0
             var curr = src
-            while (!curr.endsWith("Z")) {
-                curr = nodes[curr]!!.let { (left, right) -> if (instructions[i++ % n] == 'L') left else right }
+            fun next(): String {
+                return nodes[curr]!!.let { (left, right) -> if (instructions[i++ % n] == 'L') left else right }
             }
 
+            // find the 1st node ending with "Z"
+            while (!curr.endsWith("Z")) {
+                curr = next()
+            }
+
+            // compute the length of a cycle
             val start = curr
             var length = 0
             do {
                 length++
-                curr = nodes[curr]!!.let { (left, right) -> if (instructions[i++ % n] == 'L') left else right }
+                curr = next()
             } while (curr != start)
             return length
         }
