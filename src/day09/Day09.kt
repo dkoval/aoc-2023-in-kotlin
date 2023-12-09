@@ -34,6 +34,7 @@ fun main() {
 
             q.pollFirst()
             nums += if (last) q.peekLast() else q.peekFirst()
+
             if (allZeros) {
                 break
             }
