@@ -6,7 +6,19 @@ import readInput
 private const val DAY_ID = "08"
 
 fun main() {
-    data class Input(val instructions: String, val nodes: Map<String, Pair<String, String>>)
+    data class Input(val instructions: String, val nodes: Map<String, Pair<String, String>>) {
+        fun stepsBetween(start: String, stop: (node: String) -> Boolean): Int {
+            val n = instructions.length
+            var i = 0
+            var curr = start
+            var steps = 0
+            while (!stop(curr)) {
+                steps++
+                curr = nodes[curr]!!.let { (left, right) -> if (instructions[i++ % n] == 'L') left else right }
+            }
+            return steps
+        }
+    }
 
     fun parseInput(input: List<String>): Input {
         val instructions = input[0]
@@ -22,34 +34,16 @@ fun main() {
         return Input(instructions, nodes)
     }
 
-    fun part1(input: List<String>): Int {
-        val (instructions, nodes) = parseInput(input)
-        val n = instructions.length
-
-        var i = 0
-        var curr = "AAA"
-        var steps = 0
-        while (curr != "ZZZ") {
-            steps++
-            curr = nodes[curr]!!.let { (left, right) -> if (instructions[i++ % n] == 'L') left else right }
-        }
-        return steps
+    fun part1(lines: List<String>): Int {
+        return parseInput(lines).stepsBetween("AAA") { node -> node == "ZZZ" }
     }
 
-    fun part2(input: List<String>): Long {
-        val (instructions, nodes) = parseInput(input)
-        val n = instructions.length
+    fun part2(lines: List<String>): Long {
+        val input = parseInput(lines)
 
-        fun getCycleLength(src: String): Int {
-            var i = 0
-            var curr = src
-            var steps = 0
+        fun cycleLength(start: String): Int {
             // cycle length = the number of steps required to reach the node ending with "Z"
-            while (!curr.endsWith("Z")) {
-                steps++
-                curr = nodes[curr]!!.let { (left, right) -> if (instructions[i++ % n] == 'L') left else right }
-            }
-            return steps
+            return input.stepsBetween(start) { node -> node.endsWith("Z") }
         }
 
         fun gcd(x: Long, y: Long): Long {
@@ -60,9 +54,9 @@ fun main() {
             return x * y / gcd(x, y)
         }
 
-        return nodes.keys.asSequence()
-            .filter { src -> src.endsWith("A") }
-            .map { src -> getCycleLength(src).toLong() }
+        return input.nodes.keys.asSequence()
+            .filter { start -> start.endsWith("A") }
+            .map { start -> cycleLength(start).toLong() }
             .reduce { x, y -> lcm(x, y) }
     }
 
