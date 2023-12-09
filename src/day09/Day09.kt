@@ -13,62 +13,40 @@ fun main() {
             .sum()
     }
 
-    fun part1(input: List<String>): Int {
-        fun nextLast(xs: List<Int>): Int {
-            val lasts = mutableListOf(xs.last())
-            val q = ArrayDeque(xs)
-            while (q.size > 1) {
-                // generate next sequence of diffs
-                var allZeros = true
-                repeat(q.size - 1) {
-                    val x = q.pollFirst()
-                    val y = q.peekFirst()
-                    val diff = y - x
-                    if (diff != 0) {
-                        allZeros = false
-                    }
-                    q.offerLast(diff)
-                }
-
-                q.pollFirst()
-                lasts += q.peekLast()
-                if (allZeros) {
-                    break
-                }
-            }
-            return lasts.reduceRight { x, acc -> x + acc }
+    fun next(xs: List<Int>, last: Boolean): Int {
+        val nums = mutableListOf<Int>().apply {
+            this += if (last) xs.last() else xs.first()
         }
 
-        return solve(input) { xs -> nextLast(xs) }
+        val q = ArrayDeque(xs)
+        while (q.size > 1) {
+            // generate next sequence of diffs
+            var allZeros = true
+            repeat(q.size - 1) {
+                val x = q.pollFirst()
+                val y = q.peekFirst()
+                val diff = y - x
+                if (diff != 0) {
+                    allZeros = false
+                }
+                q.offerLast(diff)
+            }
+
+            q.pollFirst()
+            nums += if (last) q.peekLast() else q.peekFirst()
+            if (allZeros) {
+                break
+            }
+        }
+        return nums.reduceRight { x, acc -> if (last) x + acc else x - acc }
+    }
+
+    fun part1(input: List<String>): Int {
+        return solve(input) { xs -> next(xs, last = true) }
     }
 
     fun part2(input: List<String>): Int {
-        fun nextFirst(xs: List<Int>): Int {
-            val firsts = mutableListOf(xs.first())
-            val q = ArrayDeque(xs)
-            while (q.size > 1) {
-                // generate next sequence of diffs
-                var allZeros = true
-                repeat(q.size - 1) {
-                    val x = q.pollFirst()
-                    val y = q.peekFirst()
-                    val diff = y - x
-                    if (diff != 0) {
-                        allZeros = false
-                    }
-                    q.offerLast(diff)
-                }
-
-                q.pollFirst()
-                firsts += q.peekFirst()
-                if (allZeros) {
-                    break
-                }
-            }
-            return firsts.reduceRight { x, acc -> x - acc }
-        }
-
-        return solve(input) { xs -> nextFirst(xs) }
+        return solve(input) { xs -> next(xs, last = false) }
     }
 
     // test if implementation meets criteria from the description, like:
