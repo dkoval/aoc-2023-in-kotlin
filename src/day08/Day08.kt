@@ -43,23 +43,13 @@ fun main() {
         fun getCycleLength(src: String): Int {
             var i = 0
             var curr = src
-            fun next(): String {
-                return nodes[curr]!!.let { (left, right) -> if (instructions[i++ % n] == 'L') left else right }
-            }
-
-            // find the 1st node ending with "Z"
+            var steps = 0
+            // cycle length = the number of steps required to reach the node ending with "Z"
             while (!curr.endsWith("Z")) {
-                curr = next()
+                steps++
+                curr = nodes[curr]!!.let { (left, right) -> if (instructions[i++ % n] == 'L') left else right }
             }
-
-            // compute the length of a cycle
-            val start = curr
-            var length = 0
-            do {
-                length++
-                curr = next()
-            } while (curr != start)
-            return length
+            return steps
         }
 
         fun gcd(x: Long, y: Long): Long {
