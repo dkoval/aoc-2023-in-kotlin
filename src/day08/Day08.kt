@@ -20,14 +20,14 @@ fun main() {
         }
     }
 
-    fun parseInput(input: List<String>): Input {
-        val instructions = input[0]
-        val nodes = input.drop(2).asSequence()
+    fun parseInput(lines: List<String>): Input {
+        val instructions = lines[0]
+        val nodes = lines.drop(2).asSequence()
             .map { line ->
                 // AAA = (BBB, CCC)
-                val (src, pair) = line.split(" = ")
+                val (curr, pair) = line.split(" = ")
                 val (left, right) = pair.substring(1, pair.lastIndex).split(", ")
-                src to (left to right)
+                curr to (left to right)
             }
             .toMap()
 
@@ -41,11 +41,6 @@ fun main() {
     fun part2(lines: List<String>): Long {
         val input = parseInput(lines)
 
-        fun cycleLength(start: String): Int {
-            // cycle length = the number of steps required to reach the node ending with "Z"
-            return input.stepsBetween(start) { node -> node.endsWith("Z") }
-        }
-
         fun gcd(x: Long, y: Long): Long {
             return if (y == 0L) x else gcd(y, x % y)
         }
@@ -56,7 +51,10 @@ fun main() {
 
         return input.nodes.keys.asSequence()
             .filter { start -> start.endsWith("A") }
-            .map { start -> cycleLength(start).toLong() }
+            .map { start ->
+                // cycle length = the number of steps required to reach the node ending with "Z"
+                input.stepsBetween(start) { node -> node.endsWith("Z") }.toLong()
+            }
             .reduce { x, y -> lcm(x, y) }
     }
 
