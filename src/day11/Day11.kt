@@ -6,7 +6,7 @@ import readInput
 private const val DAY_ID = "11"
 
 fun main() {
-    data class Input(val galaxies: List<Pair<Int, Int>>, val emptyRows: List<Int>, val emptyCols: List<Int>)
+    data class Input(val galaxies: List<Pair<Int, Int>>, val emptyRows: Set<Int>, val emptyCols: Set<Int>)
 
     fun parseInput(grid: List<String>): Input {
         val m = grid.size
@@ -21,12 +21,14 @@ fun main() {
             }
         }
 
-        val emptyRows = grid.withIndex().asSequence()
-            .filter { (_, line) -> line.all { c -> c == '.' }  }
-            .map { (row, _) -> row }
-            .toList()
+        val emptyRows = mutableSetOf<Int>()
+        for (row in 0 until m) {
+            if (grid[row].all { c -> c == '.' }) {
+                emptyRows += row
+            }
+        }
 
-        val emptyCols = mutableListOf<Int>()
+        val emptyCols = mutableSetOf<Int>()
         for (col in 0 until n) {
             var empty = true
             for (row in 0 until m) {
@@ -42,31 +44,35 @@ fun main() {
         return Input(galaxies, emptyRows, emptyCols)
     }
 
-    fun dist(input: Input, g1: Int, g2: Int, expandRatio: Int): Long {
-        val (galaxies, emptyRows, emptyCols) = input
-        val (row1, col1) = galaxies[g1]
-        val (row2, col2) = galaxies[g2]
+    fun dist(
+        g1: Pair<Int, Int>,
+        g2: Pair<Int, Int>,
+        emptyRows: Set<Int>,
+        emptyCols: Set<Int>,
+        ratio: Int
+    ): Long {
+        val (row1, col1) = g1
+        val (row2, col2) = g2
 
-        var dist = 0L
-        for (row in minOf(row1, row2) until maxOf(row1, row2)) {
-            dist += if (row in emptyRows) expandRatio else 1
+        fun steps(x: Int, y: Int, empty: Set<Int>): Long {
+            var steps = 0L
+            for (row in minOf(x, y) until maxOf(x, y)) {
+                steps += if (row in empty) ratio else 1
+            }
+            return steps
         }
 
-        for (col in minOf(col1, col2) until maxOf(col1, col2)) {
-            dist += if (col in emptyCols) expandRatio else 1
-        }
-        return dist
+        return steps(row1, row2, emptyRows) + steps(col1, col2, emptyCols)
     }
 
-    fun solve(lines: List<String>, expansionRatio: Int = 2): Long {
-        val input = parseInput(lines)
-        val (galaxies, _, _) = input
+    fun solve(lines: List<String>, ratio: Int = 2): Long {
+        val (galaxies, emptyRows, emptyCols) = parseInput(lines)
 
         // generate all possible pairs of galaxies
         var sum = 0L
-        for (g1 in 0 until  galaxies.lastIndex) {
+        for (g1 in 0 until galaxies.lastIndex) {
             for (g2 in g1 + 1 until galaxies.size) {
-                sum += dist(input, g1, g2, expansionRatio)
+                sum += dist(galaxies[g1], galaxies[g2], emptyRows, emptyCols, ratio)
             }
         }
         return sum
@@ -76,8 +82,8 @@ fun main() {
         return solve(lines)
     }
 
-    fun part2(lines: List<String>, expansionRatio: Int): Long {
-        return solve(lines, expansionRatio)
+    fun part2(lines: List<String>, ratio: Int): Long {
+        return solve(lines, ratio)
     }
 
     // test if implementation meets criteria from the description, like:
