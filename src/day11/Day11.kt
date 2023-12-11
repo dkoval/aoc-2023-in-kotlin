@@ -45,14 +45,14 @@ fun main() {
     }
 
     fun dist(
-        g1: Pair<Int, Int>,
-        g2: Pair<Int, Int>,
+        galaxy1: Pair<Int, Int>,
+        galaxy2: Pair<Int, Int>,
         emptyRows: Set<Int>,
         emptyCols: Set<Int>,
         ratio: Int
     ): Long {
-        val (row1, col1) = g1
-        val (row2, col2) = g2
+        val (row1, col1) = galaxy1
+        val (row2, col2) = galaxy2
 
         fun steps(x: Int, y: Int, empty: Set<Int>): Long {
             var steps = 0L
@@ -70,9 +70,9 @@ fun main() {
 
         // generate all possible pairs of galaxies
         var sum = 0L
-        for (g1 in 0 until galaxies.lastIndex) {
-            for (g2 in g1 + 1 until galaxies.size) {
-                sum += dist(galaxies[g1], galaxies[g2], emptyRows, emptyCols, ratio)
+        for (i in 0 until galaxies.lastIndex) {
+            for (j in i + 1 until galaxies.size) {
+                sum += dist(galaxies[i], galaxies[j], emptyRows, emptyCols, ratio)
             }
         }
         return sum
