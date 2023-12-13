@@ -21,7 +21,7 @@ fun main() {
             }
     }
 
-    fun findMirror(grid: List<List<Char>>, diffs: Int = 0): Int {
+    fun findMirrorPoint(grid: List<List<Char>>, diffs: Int): Int {
         val n = grid.size
         for (center in 1 until n) {
             var left = center - 1
@@ -46,14 +46,14 @@ fun main() {
         return 0
     }
 
-    fun solve(input: String, diffs: Int): Int {
+    fun solve(input: String, diffs: Int = 0): Int {
         return parseInput(input)
-            .map { (rows, cols) -> findMirror(rows, diffs) * 100 + findMirror(cols, diffs) }
+            .map { (rows, cols) -> findMirrorPoint(rows, diffs) * 100 + findMirrorPoint(cols, diffs) }
             .sum()
     }
 
     fun part1(input: String): Int {
-        return solve(input, diffs = 0)
+        return solve(input)
     }
 
     fun part2(input: String): Int {
