@@ -6,11 +6,11 @@ import readInput
 private const val DAY_ID = "14"
 
 fun main() {
-    class Grid(private val grid: List<MutableList<Char>>) {
+    class Grid(private var grid: List<MutableList<Char>>) {
         val m = grid.size
         val n = grid[0].size
 
-        fun rollNorth(): Grid {
+        private fun rollNorth(): Grid {
             for (col in 0 until n) {
                 for (row in 1 until m) {
                     var x = row
@@ -24,7 +24,7 @@ fun main() {
             return this
         }
 
-        fun rollSouth(): Grid {
+        private fun rollSouth(): Grid {
             for (col in 0 until n) {
                 for (row in m - 1 downTo 0) {
                     var x = row
@@ -38,7 +38,7 @@ fun main() {
             return this
         }
 
-        fun rollWest(): Grid {
+        private fun rollWest(): Grid {
             for (row in 0 until m) {
                 for (col in 1 until n) {
                     var y = col
@@ -52,7 +52,7 @@ fun main() {
             return this
         }
 
-        fun rollEast(): Grid {
+        private fun rollEast(): Grid {
             for (row in 0 until m) {
                 for (col in m - 1 downTo 0) {
                     var y = col
@@ -66,8 +66,48 @@ fun main() {
             return this
         }
 
-        fun state(): List<List<Char>> {
-            return grid.map { it.toList() }
+        fun tiltNorth(): Grid {
+            rollNorth()
+            return this
+        }
+
+        fun tiltCycle(cycles: Int): Grid {
+            var i = 0
+            var curr = takeSnapshot()
+            val states = mutableListOf(curr)
+            var offset = -1
+            while (i < cycles) {
+                curr = rollNorth().rollWest().rollSouth().rollEast().takeSnapshot()
+                i++
+                // already seen?
+                offset = states.indexOf(curr)
+                if (offset != -1) {
+                    break
+                }
+                states += curr
+            }
+
+            if (i < cycles) {
+                val cycleLength = i - offset
+                grid = states[(cycles - offset) % cycleLength + offset]
+            }
+            return this
+        }
+
+        private fun takeSnapshot(): List<MutableList<Char>> {
+            return grid.map { it.toMutableList() }
+        }
+
+        fun totalLoad(): Int {
+            var total = 0
+            for (row in 0 until m) {
+                for (col in 0 until n) {
+                    if (grid[row][col] == 'O') {
+                        total += m - row
+                    }
+                }
+            }
+            return total
         }
 
         override fun toString(): String {
@@ -79,51 +119,14 @@ fun main() {
         return Grid(lines.map { it.toMutableList() })
     }
 
-    fun totalLoad(grid: List<List<Char>>): Int {
-        val m = grid.size
-        val n = grid[0].size
-
-        var total = 0
-        for (row in 0 until m) {
-            for (col in 0 until n) {
-                if (grid[row][col] == 'O') {
-                    total += m - row
-                }
-            }
-        }
-        return total
-    }
-
     fun part1(lines: List<String>): Int {
         val grid = parseInput(lines)
-
-        val curr = grid.rollNorth().state()
-        return totalLoad(curr)
+        return grid.tiltNorth().totalLoad()
     }
 
     fun part2(lines: List<String>): Int {
         val grid = parseInput(lines)
-        val cycles = 1000000000
-
-        var i = 0
-        var curr = grid.state()
-        val states = mutableListOf(curr)
-        while (i < cycles) {
-            curr = grid.rollNorth().rollWest().rollSouth().rollEast().state()
-            i++
-            if (curr in states) {
-                break
-            }
-            states += curr
-        }
-
-        if (i < cycles) {
-            val offset = states.indexOf(curr)
-            val cycleLength = i - offset
-            curr = states[(cycles - offset) % cycleLength + offset]
-        }
-
-        return totalLoad(curr)
+        return grid.tiltCycle(1000000000).totalLoad()
     }
 
     // test if implementation meets criteria from the description, like:
