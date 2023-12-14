@@ -74,22 +74,23 @@ fun main() {
         fun tiltCycle(cycles: Int): Grid {
             var i = 0
             var curr = takeSnapshot()
-            val states = mutableListOf(curr)
-            var offset = -1
+            val visitedStates = mutableMapOf(curr to 0)
+            val indexedStates = mutableListOf(curr)
             while (i < cycles) {
                 curr = rollNorth().rollWest().rollSouth().rollEast().takeSnapshot()
                 i++
                 // already seen?
-                offset = states.indexOf(curr)
-                if (offset != -1) {
+                if (curr in visitedStates) {
                     break
                 }
-                states += curr
+                visitedStates += curr to i
+                indexedStates += curr
             }
 
             if (i < cycles) {
+                val offset = visitedStates[curr]!!
                 val cycleLength = i - offset
-                grid = states[(cycles - offset) % cycleLength + offset]
+                grid = indexedStates[(cycles - offset) % cycleLength + offset]
             }
             return this
         }
