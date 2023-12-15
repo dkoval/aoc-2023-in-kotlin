@@ -7,11 +7,7 @@ private const val DAY_ID = "15"
 
 fun main() {
     fun hash(s: String) = s.fold(0) { acc, c ->
-        var curr = acc
-        curr += c.code
-        curr *= 17
-        curr %= 256
-        curr
+        (acc + c.code) * 17 % 256
     }
 
     fun part1(input: String): Int {
