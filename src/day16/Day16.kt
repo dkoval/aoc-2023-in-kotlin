@@ -133,8 +133,8 @@ fun main() {
 
     // test if implementation meets criteria from the description, like:
     val testInput = readInput("day$DAY_ID/Day${DAY_ID}_test")
-    check(part1(testInput).println() == 46)
-    check(part2(testInput).println() == 51)
+    check(part1(testInput) == 46)
+    check(part2(testInput) == 51)
 
     val input = readInput("day$DAY_ID/Day$DAY_ID")
     part1(input).println() // answer = 7623
