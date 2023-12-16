@@ -127,7 +127,6 @@ fun main() {
                 best = maxOf(best, countEnergizedTiles(grid, Tile(row, n - 1), Direction.LEFT))
             }
         }
-
         return best
     }
 
