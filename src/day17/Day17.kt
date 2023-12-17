@@ -40,7 +40,7 @@ fun main() {
     data class State(val pos: Cell, val dir: Direction, val streak: Int)
 
     fun parseInput(lines: List<String>): List<List<Int>> {
-        return lines.map { it.asSequence().map { c -> c.digitToInt() }.toList() }
+        return lines.map { line -> line.map { c -> c.digitToInt() } }
     }
 
     fun solve(
