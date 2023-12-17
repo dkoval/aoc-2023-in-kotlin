@@ -43,7 +43,12 @@ fun main() {
         return lines.map { it.asSequence().map { c -> c.digitToInt() }.toList() }
     }
 
-    fun part1(lines: List<String>): Int {
+    fun solve(
+        lines: List<String>,
+        canMoveSameDirection: (streak: Int) -> Boolean,
+        canChangeDirection: (streak: Int) -> Boolean = { true },
+        canStop: (streak: Int) -> Boolean = { true }
+    ): Int {
         val grid = parseInput(lines)
         val m = grid.size
         val n = grid[0].size
@@ -62,7 +67,7 @@ fun main() {
             }
 
             visited += curr
-            if (curr.pos == target) {
+            if (curr.pos == target && canStop(curr.streak)) {
                 return heatLoss
             }
 
@@ -79,65 +84,34 @@ fun main() {
 
                 if (nextDir == curr.dir) {
                     // keep on moving in the same direction
-                    if (curr.streak < 3) {
+                    if (canMoveSameDirection(curr.streak)) {
                         q.offer(State(nextPos, nextDir, curr.streak + 1) to heatLoss + grid[nextPos.row][nextPos.col])
                     }
                 } else {
                     // change direction, reset streak
-                    q.offer(State(nextPos, nextDir, 1) to heatLoss + grid[nextPos.row][nextPos.col])
+                    if (canChangeDirection(curr.streak)) {
+                        q.offer(State(nextPos, nextDir, 1) to heatLoss + grid[nextPos.row][nextPos.col])
+                    }
                 }
             }
         }
         return -1
     }
 
+    fun part1(lines: List<String>): Int {
+        return solve(
+            lines,
+            canMoveSameDirection = { streak -> streak < 3 }
+        )
+    }
+
     fun part2(lines: List<String>): Int {
-        val grid = parseInput(lines)
-        val m = grid.size
-        val n = grid[0].size
-
-        val source = Cell(0, 0)
-        val target = Cell(m - 1, n - 1)
-
-        // Dijkstra
-        val q = PriorityQueue<Pair<State, Int>>(compareBy { (_, heatLoss) -> heatLoss })
-        val visited = mutableSetOf<State>()
-        q.offer(State(source, Direction.NONE, 0) to 0)
-        while (!q.isEmpty()) {
-            val (curr, heatLoss) = q.poll()
-            if (curr in visited) {
-                continue
-            }
-
-            visited += curr
-            if (curr.pos == target && curr.streak >= 4) {
-                // must move >= 4 bocks before it can stop at the end
-                return heatLoss
-            }
-
-            for (nextDir in EnumSet.of(Direction.LEFT, Direction.RIGHT, Direction.UP, Direction.DOWN)) {
-                // can't go backwards
-                if (nextDir == curr.dir.opposite()) {
-                    continue
-                }
-
-                val nextPos = curr.pos.next(nextDir)
-                if (!nextPos.inbounds(m, n)) {
-                    continue
-                }
-
-                if (nextDir == curr.dir) {
-                    // keep on moving in the same direction
-                    if (curr.streak < 10) {
-                        q.offer(State(nextPos, nextDir, curr.streak + 1) to heatLoss + grid[nextPos.row][nextPos.col])
-                    }
-                } else if (curr.streak == 0 || curr.streak >= 4) {
-                    // change direction, reset streak
-                    q.offer(State(nextPos, nextDir, 1) to heatLoss + grid[nextPos.row][nextPos.col])
-                }
-            }
-        }
-        return -1
+        return solve(
+            lines,
+            canMoveSameDirection = { streak -> streak < 10 },
+            canChangeDirection = { streak -> streak == 0 || streak >= 4 },
+            canStop = { streak -> streak >= 4 }
+        )
     }
 
     // test if implementation meets criteria from the description, like:
